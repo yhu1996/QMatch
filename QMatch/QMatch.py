@@ -86,6 +86,10 @@ def IsingGS_CorrMtx(L):
     return G_ij
 
 
+def IdCorrMtx(L):
+    return np.zeros([2*L,2*L])
+
+
 def ground_state_energy(M):
 	# schur decompose M_ij 
     epsilon, O = antisym_decomp(M)
@@ -234,87 +238,26 @@ def rotated_Petz_map(Grho, t, A_N, B_N, G_sigma):
 
 
 # measure Z at site = spin, return the new correlation matrix after measurement 
-def measure_Z(state_Cij, spin):
+def measure_Z(Grho, spin):
     # site = spin in (0,...,L-1)
-    L = square_mat_get_size(state_Cij)
+    L = square_mat_get_size(Grho)
     random_num = random.uniform(0, 1)
-    prob_0 = 1/2 + 1/2 * state_Cij[2*spin, 2*spin+1]
+    prob_0 = 1/2 + 1/2 * Grho[2*spin, 2*spin+1]
     if random_num < prob_0:
         epsilon = 0
     else:
         epsilon = 1
     #print(epsilon,prob_0)
-    x = state_Cij[2*spin, 2*spin+1] * (-1)**(epsilon+1)
+    x = Grho[2*spin, 2*spin+1] * (-1)**(epsilon+1)
     new_Cij = np.zeros([2*L,2*L])
     for a in range(L):
         if a != spin:
             for b in range(L):
                 if b != spin:
-                    new_Cij[2*a,2*b] = state_Cij[2*a, 2*b] - (-1)**(epsilon+1)/(1-x) * (state_Cij[2*a, 2*spin] * state_Cij[2*spin+1, 2*b]- state_Cij[2*a, 2*spin+1] * state_Cij[2*spin, 2*b] )
-                    new_Cij[2*a+1,2*b] = state_Cij[2*a+1, 2*b] - (-1)**(epsilon+1)/(1-x) * (state_Cij[2*a+1, 2*spin] * state_Cij[2*spin+1, 2*b]- state_Cij[2*a+1, 2*spin+1] * state_Cij[2*spin, 2*b] )
-                    new_Cij[2*a,2*b+1] = state_Cij[2*a, 2*b+1] - (-1)**(epsilon+1)/(1-x) * (state_Cij[2*a, 2*spin] * state_Cij[2*spin+1, 2*b+1]- state_Cij[2*a, 2*spin+1] * state_Cij[2*spin, 2*b+1] )
-                    new_Cij[2*a+1,2*b+1] = state_Cij[2*a+1, 2*b+1] - (-1)**(epsilon+1)/(1-x) * (state_Cij[2*a+1, 2*spin] * state_Cij[2*spin+1, 2*b+1]- state_Cij[2*a+1, 2*spin+1] * state_Cij[2*spin, 2*b+1] )
+                    new_Cij[2*a,2*b] = Grho[2*a, 2*b] - (-1)**(epsilon+1)/(1-x) * (Grho[2*a, 2*spin] * Grho[2*spin+1, 2*b]- Grho[2*a, 2*spin+1] * Grho[2*spin, 2*b] )
+                    new_Cij[2*a+1,2*b] = Grho[2*a+1, 2*b] - (-1)**(epsilon+1)/(1-x) * (Grho[2*a+1, 2*spin] * Grho[2*spin+1, 2*b]- Grho[2*a+1, 2*spin+1] * Grho[2*spin, 2*b] )
+                    new_Cij[2*a,2*b+1] = Grho[2*a, 2*b+1] - (-1)**(epsilon+1)/(1-x) * (Grho[2*a, 2*spin] * Grho[2*spin+1, 2*b+1]- Grho[2*a, 2*spin+1] * Grho[2*spin, 2*b+1] )
+                    new_Cij[2*a+1,2*b+1] = Grho[2*a+1, 2*b+1] - (-1)**(epsilon+1)/(1-x) * (Grho[2*a+1, 2*spin] * Grho[2*spin+1, 2*b+1]- Grho[2*a+1, 2*spin+1] * Grho[2*spin, 2*b+1] )
     new_Cij[2*spin, 2*spin+1] = (-1)**epsilon
     new_Cij[2*spin+1, 2*spin] = -(-1)**epsilon
     return new_Cij
-
-
-
-###################################################################
-###### Critical Ising Ground State via exact diagonalization ######
-###################################################################
-
-def Ising_H_def(L, g):
-    mat = np.zeros([2**L,2**L])
-    # Pauli Matrices
-    sigma_x = np.array([[0,1],[1,0]])
-    sigma_z = np.array([[1,0],[0,-1]])
-    id2 = np.array([[1,0],[0,1]])
-    for i in range(L):
-        ## X_i X_i+1
-        if i == 0 or i == L-1:
-            XX = sigma_x
-        else:
-            XX = id2
-        for j in range(1,L):
-            if j == i or j == i+1:
-                XX = np.kron(XX, sigma_x)
-            else:
-                XX = np.kron(XX, id2)  
-        ## Z_i
-        if i == 0:
-            Z = sigma_z
-        else: 
-            Z = id2
-        for j in range(1,L):
-            if j == i:
-                Z = np.kron(Z,sigma_z)
-            else:
-                Z = np.kron(Z,id2)
-
-        mat -= (XX + g*Z)
-    return mat
-
-def SvN_exact_diag(rho):
-    S = LA.eigvalsh(rho)
-    log_rho = np.log2(S, out=np.zeros_like(S, dtype=np.float64), where=(S > 1e-10))
-    entropy = - np.dot(S, log_rho)
-    return entropy
-
-
-def get_rhoA_exact_diag(state, L_A, L):
-    if L_A <= L:
-        state = state.reshape(2**L_A, 2**(L-L_A))
-        rho_A = np.matmul(state, np.conjugate(state).transpose())
-        return rho_A
-    else:
-        print('Error: the subregion size is bigger than the system size!')
-        return 0
-
-def Ising_SvN_exact_diag(L_A, L):
-    H = Ising_H_def(L, 1)
-    eigv, eigvec = LA.eigh(H)
-    state = eigvec[:,0]
-    rho_A = get_rhoA_exact_diag(state, L_A, L)
-    SvN = SvN_exact_diag(rho_A)
-    return SvN
