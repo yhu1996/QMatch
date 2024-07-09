@@ -1,7 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
-import scipy.linalg as scipyla
-import random
+
 
 ###################################################################
 ###### Critical Ising Ground State via exact diagonalization ######
@@ -13,6 +12,8 @@ def Ising_H_def(L, g):
     sigma_x = np.array([[0,1],[1,0]])
     sigma_z = np.array([[1,0],[0,-1]])
     id2 = np.array([[1,0],[0,1]])
+    if L == 1:
+        return -id2-g*sigma_z
     for i in range(L):
         ## X_i X_i+1
         if i == 0 or i == L-1:
@@ -45,6 +46,12 @@ def SvN_exact_diag(rho):
     return entropy
 
 
+def SvN_eigval(S):
+    log_rho = np.log2(S, out=np.zeros_like(S, dtype=np.float64), where=(S > 1e-10))
+    entropy = - np.dot(S, log_rho)
+    return entropy
+
+
 def get_rhoA_exact_diag(state, L_A, L):
     if L_A <= L:
         state = state.reshape(2**L_A, 2**(L-L_A))
@@ -52,12 +59,30 @@ def get_rhoA_exact_diag(state, L_A, L):
         return rho_A
     else:
         print('Error: the subregion size is bigger than the system size!')
-        return 0
+        return np.zeros([0,0])
 
-def Ising_SvN_exact_diag(L_A, L):
+
+def Ising_ground_state(L):
     H = Ising_H_def(L, 1)
     eigv, eigvec = LA.eigh(H)
     state = eigvec[:,0]
+    return state
+
+
+def Ising_SvN_exact_diag(L_A, L):
+    state = Ising_ground_state(L)
     rho_A = get_rhoA_exact_diag(state, L_A, L)
     SvN = SvN_exact_diag(rho_A)
     return SvN
+
+
+
+# compute I(A:C|B) = S_AB + S_BC - S_B - S_ABC
+def IACB_eigval(rho_AB_eig, rho_BC_eig, rho_ABC_eig, rho_B_eig):
+
+	S_AB = SvN_eigval(rho_AB_eig)
+	S_BC = SvN_eigval(rho_BC_eig)
+	S_B = SvN_eigval(rho_B_eig)
+	S_ABC = SvN_eigval(rho_ABC_eig)
+
+	return S_AB + S_BC - S_B - S_ABC

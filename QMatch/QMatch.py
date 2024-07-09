@@ -71,8 +71,8 @@ def Ising_Hamiltonian_M(L):
     for k in range(2*L-1):
         M_ij[k,k+1] = 1
         M_ij[k+1,k] = -1
-    M_ij[2*L-1,0] = -1
-    M_ij[0,2*L-1] = 1
+    M_ij[2*L-1,0] += -1
+    M_ij[0,2*L-1] += 1
     return M_ij
 
 
@@ -99,7 +99,7 @@ def ground_state_energy(M):
 
 # get correlation matrix for reduced density matrix
 def reduced_CorrMtx(Grho, siteL, siteR):
-    # trace out complement of A, A start from siteL to siteR
+    # trace out complement of A, A start from (siteL+1)-th spin to siteR-th spin
     start = 2 * siteL
     new_length = 2 * (siteR - siteL)
     if new_length > 0:
@@ -109,8 +109,8 @@ def reduced_CorrMtx(Grho, siteL, siteR):
                 G_cut[i,j] = Grho[i+start, j+start]
         return G_cut
     else:
-        print('Warning: the resulting region is empty!')
-        return 0
+        #print('Warning: the resulting region is empty!')
+        return np.zeros([0,0])
 
 
 def tensor_prod(G1, G2):
@@ -129,14 +129,14 @@ def vn_entropy(Grho):
 
 
 # compute CMI given the correlation function and the subsystem configuration
-def CMI(Grho, La, Lb, Lc):
-    Grho_AB = reduced_CorrMtx(Grho, 0, La+Lb)
+def CMI(GrhoABC, La, Lb, Lc):
+    Grho_AB = reduced_CorrMtx(GrhoABC, 0, La+Lb)
     S_AB = vn_entropy(Grho_AB)
-    Grho_BC = reduced_CorrMtx(Grho, La, La+Lb+Lc)
+    Grho_BC = reduced_CorrMtx(GrhoABC, La, La+Lb+Lc)
     S_BC = vn_entropy(Grho_BC)
-    Grho_B = reduced_CorrMtx(Grho, La, La+Lb)
+    Grho_B = reduced_CorrMtx(GrhoABC, La, La+Lb)
     S_B = vn_entropy(Grho_B)
-    S_ABC = vn_entropy(Grho)
+    S_ABC = vn_entropy(GrhoABC)
     return S_AB + S_BC - S_B - S_ABC
 
 
@@ -199,15 +199,16 @@ def B_sigma_t_Block(eps, t):
         return np.identity(2)
     block = np.zeros([2,2])
     factor = (1+eps)/(1-eps)
-    block[0,0] = np.real(factor**(1j*t))
-    block[0,1] = -np.imag(factor**(1j*t))
+    block[0,0] = np.real(factor**(1j*t/2))
+    block[0,1] = -np.imag(factor**(1j*t/2))
     block[1,0] = - block[0,1]
     block[1,1] = block[0,0]
     return block
 
 def B_sigma_t(G_sigma, t, size_n):
     eps, O = antisym_decomp(G_sigma)
-    #print(eps)
+    if size_n == 0:
+        return np.zeros([0,0])
     block = B_sigma_t_Block(eps[0], t)
     for i in range(1,size_n):
         block = scipyla.block_diag(block,B_sigma_t_Block(eps[i], t))
@@ -247,7 +248,6 @@ def measure_Z(Grho, spin):
         epsilon = 0
     else:
         epsilon = 1
-    #print(epsilon,prob_0)
     x = Grho[2*spin, 2*spin+1] * (-1)**(epsilon+1)
     new_Cij = np.zeros([2*L,2*L])
     for a in range(L):

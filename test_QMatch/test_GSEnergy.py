@@ -6,10 +6,11 @@ import sys
 sys.path.append(os.path.abspath("../"))
 
 from QMatch import QMatch as QM
-import numpy as np
+from Ising_exact import *
 
-# check function GroundStateCorrMtx(M)
-for L in range(1,20):
+# check function ground_state_energy(M)
+for L in range(1,10):
     M = QM.Ising_Hamiltonian_M(L)
-    if not np.allclose(QM.IsingGS_CorrMtx(L), QM.GroundStateCorrMtx(M)):
+    E = LA.eigvalsh(Ising_H_def(L, g=1))
+    if abs(QM.ground_state_energy(M) - E[0]) > 1e-10:
         print("Error happens when L = %d"%L)
