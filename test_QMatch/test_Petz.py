@@ -9,7 +9,7 @@ from QMatch import QMatch as QM
 from Ising_exact import *
 from Uhlmann_Fidelity import *
 
-# check function Petz_map(Grho, A_N, B_N, G_sigma) by check the Petz fidelity
+# check function Petz_map(Grho, A_N, B_N, G_sigma) by checking the Petz fidelity
 
 def erasure_Petz(Grho_ABC, La, Lb, Lc):
     A_N, B_N = QM.erasure_channel_param(La+Lb, Lc)
