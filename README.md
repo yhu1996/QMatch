@@ -7,17 +7,25 @@ QMatch is Python package for simulating fermionic Gaussian states and operations
 - Tutorial.ipynb is a jupyter notebook giving a thorough introduction of the QMatch
 
 
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yhu1996/QMatch.git
+
+# Navigate to the project directory
+cd QMatch-main
+
+# install the package in "editable" or "development" mode
+pip install -e . 
+
+```
 
 ## Usage
-First, download the folder QMatch.
-
-Then, for example, put your scripts in the same directory as the folder QMatch. 
 
 ```python
 # Import the QM package
-import sys
-import os
-sys.path.append(os.path.abspath("./"))
+
 from QMatch import QMatch as QM
 
 # Use the func function
