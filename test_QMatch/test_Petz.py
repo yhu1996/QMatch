@@ -9,7 +9,7 @@ from QMatch import QMatch as QM
 from Ising_exact import *
 from Uhlmann_Fidelity import *
 
-# check function Petz_map(Grho, A_N, B_N, G_sigma) by checking the Petz fidelity
+# check function Petz_map(Grho, A_N, B_N, G_sigma) by check the Petz fidelity
 
 def erasure_Petz(Grho_ABC, La, Lb, Lc):
     A_N, B_N = QM.erasure_channel_param(La+Lb, Lc)
@@ -28,9 +28,7 @@ for La in range(L):
                 Grho_ABC = QM.reduced_CorrMtx(Grho, 0, La+Lb+Lc)
                 F1 = QM.Fidelity(Grho_ABC, erasure_Petz(Grho_ABC, La, Lb, Lc))
                 F2 = UFt_state(state, La, Lb, Lc, L, 0)
-                if abs(F1-F2) > 1e-6:
-                    print('Error')
-                    print(La, Lb, Lc, F1, F2)
+                assert abs(F1-F2) < 1e-6
 
 
 # both QM.Fidelity and UFt_state function can handle empty state

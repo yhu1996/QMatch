@@ -31,6 +31,4 @@ for La in range(L):
                 for t in t_lst:
                     F1 = QM.Fidelity(Grho_ABC, erasure_rotated_Petz(Grho_ABC, La, Lb, Lc, t))
                     F2 = UFt_state(state, La, Lb, Lc, L, t)
-                    if abs(F1-F2) > 1e-6:
-                        print('Error')
-                        print(La, Lb, Lc, F1, F2, t)
+                    assert abs(F1-F2) < 1e-6

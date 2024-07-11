@@ -36,7 +36,7 @@ def Ising_CMI_exact_diag(La, Lb, Lc, L):
     IACB_state = IACB_eigval(rhoAB_S, rhoBC_S, rhoABC_S, rhoB_S)
     return IACB_state
 
-L = 6
+L = 8
 Grho = QM.IsingGS_CorrMtx(L)
 state = Ising_ground_state(L)
 
@@ -45,5 +45,4 @@ for La in range(L):
         for Lc in range(L):
             if L - La - Lb - Lc > 0:
                 G_rhoABC = QM.reduced_CorrMtx(Grho, 0, La+Lb+Lc)
-                if abs(QM.CMI(G_rhoABC, La, Lb, Lc) - Ising_CMI_exact_diag(La, Lb, Lc, L)) > 1e-10:
-                    print("Error happens when La = %d, Lb = %d, Lc = %d"%(La, Lb, Lc))
+                assert abs(QM.CMI(G_rhoABC, La, Lb, Lc) - Ising_CMI_exact_diag(La, Lb, Lc, L)) < 1e-8

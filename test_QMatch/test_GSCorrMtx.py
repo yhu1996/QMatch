@@ -11,5 +11,4 @@ import numpy as np
 # check function GroundStateCorrMtx(M)
 for L in range(1,20):
     M = QM.Ising_Hamiltonian_M(L)
-    if not np.allclose(QM.IsingGS_CorrMtx(L), QM.GroundStateCorrMtx(M)):
-        print("Error happens when L = %d"%L)
+    assert np.allclose(QM.IsingGS_CorrMtx(L), QM.GroundStateCorrMtx(M))

@@ -30,6 +30,4 @@ for L1 in range(2,7):
         sigma = get_rhoA_exact_diag(state2, L2, L2)
         F2 = fidelity(rho, sigma)
 
-        if abs(F1-F2) > 1e-4:
-            print('Error')
-            print(L1, L2, F1, F2)
+        assert abs(F1-F2) < 1e-4

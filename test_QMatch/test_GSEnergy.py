@@ -12,5 +12,4 @@ from Ising_exact import *
 for L in range(1,10):
     M = QM.Ising_Hamiltonian_M(L)
     E = LA.eigvalsh(Ising_H_def(L, g=1))
-    if abs(QM.ground_state_energy(M) - E[0]) > 1e-10:
-        print("Error happens when L = %d"%L)
+    assert abs(QM.ground_state_energy(M) - E[0]) < 1e-10
