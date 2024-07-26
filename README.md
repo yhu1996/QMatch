@@ -37,11 +37,11 @@ QM.func()
 ## Features
 The current version includes the following features.
 
-- ground state correlation matrix from the Hamiltonian <!---: **GroundStateCorrMtx(M: np.ndarray) -> np.ndarray** -->
+- ground state correlation matrix (given the Hamiltonian) <!---: **GroundStateCorrMtx(M: np.ndarray) -> np.ndarray** -->
 - critical Ising ground state correlation matrix<!---: **IsingGS_CorrMtx(L: int) -> np.ndarray** -->
 - correlation matrix for $\rho \propto \mathbb{I}_L$<!---: **IdCorrMtx(L: int) -> np.ndarray** -->
-- ground state energy from the Hamiltonian<!---: **ground_state_energy(M: np.ndarray) -> float** -->
-- tracing<!---: **reduced_CorrMtx(Grho: np.ndarray, siteL: int, siteR: int) -> np.ndarray** -->
+- ground state energy (given the Hamiltonian)<!---: **ground_state_energy(M: np.ndarray) -> float** -->
+- partial trace<!---: **reduced_CorrMtx(Grho: np.ndarray, siteL: int, siteR: int) -> np.ndarray** -->
 - tensor product<!---: **tensor_prod(G1: np.ndarray, G2: np.ndarray) -> : np.ndarray** -->
 - von Neumann Entropy<!---: **vn_entropy(Grho: np.ndarray) -> float** -->
 - Conditional mutual information<!---: **CMI(Grho: np.ndarray, La: int, Lb: int, Lc: int) -> float** -->
@@ -50,4 +50,4 @@ The current version includes the following features.
 - Erasure channel<!---: **erasure_channel(Grho: np.ndarray, L1: int, L2: int) -> np.ndarray** -->
 - Petz recovery map<!---: **Petz_map(Grho: np.ndarray, A_N: np.ndarray, B_N: np.ndarray, G_sigma: np.ndarray) -> np.ndarray** -->
 - rotated Petz recovery map<!---: **rotated_Petz_map(Grho: np.ndarray, t: float, A_N: np.ndarray, B_N: np.ndarray, G_sigma: np.ndarray) -> np.ndarray** -->
-- Z measurement<!---: **measure_Z(Grho: np.ndarray, spin: int) -> np.ndarray** -->
+- local Z measurement<!---: **measure_Z(Grho: np.ndarray, spin: int) -> np.ndarray** -->
